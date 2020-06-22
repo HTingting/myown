@@ -1,0 +1,14 @@
+/**
+index.less文件在app.vue入口文件就被全局引用了
+  其中：
+    custom.less 是定义了全局的公共属性，比如颜色，大小等等；
+    mixins/index 暂且不知道
+    common/index 是定义了base，layout，iconfont这些底层的
+    animation/index 是定义了动画的函数处理
+    components/index 是定义了组件的各种样式
+ */
+@import "./custom";
+@import "./mixins/index";
+@import "./common/index";
+@import "./animation/index";
+@import "./components/index";

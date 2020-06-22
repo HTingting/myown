@@ -1,15 +1,20 @@
 {
-  "name": "myown",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@ecpark/myown",
+  "version": "0.1.2",
+  "private": false,
+  "description": "基于 Vue 的下拉刷新",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "lib": "vue-cli-service build --target lib --name myown --dest lib components/index.js"
   },
   "dependencies": {
     "core-js": "^2.6.5",
-    "vue": "^2.6.10"
+    "less": "^2.7.3",
+    "less-loader": "^4.0.6",
+    "vue": "^2.6.10",
+    "vue-router": "^3.3.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.9.0",
@@ -18,7 +23,10 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
-    "vue-template-compiler": "^2.6.10"
+    "node-sass": "^4.14.1",
+    "sass-loader": "^8.0.2",
+    "vue-template-compiler": "^2.6.10",
+    "webpack": "^5.0.0-beta.16"
   },
   "eslintConfig": {
     "root": true,
@@ -42,5 +50,6 @@
   "browserslist": [
     "> 1%",
     "last 2 versions"
-  ]
+  ],
+  "main": "lib/myown.umd.js"
 }
