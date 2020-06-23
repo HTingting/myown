@@ -1,0 +1,110 @@
+/**
+index.less文件在app.vue入口文件就被全局引用了
+  其中：
+    custom.less 是定义了全局的公共属性，比如颜色，大小等等；
+    mixins/index 暂且不知道
+    common/index 是定义了base，layout，iconfont这些底层的
+    animation/index 是定义了动画的函数处理
+    components/index 是定义了组件的各种样式
+ */
+body {
+  padding: 0;
+  margin: 0;
+}
+.my-alert {
+  position: relative;
+  padding: 8px 48px 8px 16px;
+  border-radius: 4px;
+  color: #515a6e;
+  font-size: 12px;
+  line-height: 16px;
+  margin-bottom: 10px;
+}
+.my-alert.my-alert-with-icon {
+  padding: 8px 48px 8px 38px;
+}
+.my-alert-icon {
+  font-size: 16px;
+  top: 6px;
+  left: 12px;
+  position: absolute;
+}
+.my-alert-desc {
+  font-size: 12px;
+  color: #515a6e;
+  line-height: 21px;
+  display: none;
+  text-align: justify;
+}
+.my-alert-success .my-alert-icon {
+  color: #19be6b;
+}
+.my-alert-info .my-alert-icon {
+  color: #2d8cf0;
+}
+.my-alert-warning .my-alert-icon {
+  color: #ff9900;
+}
+.my-alert-error .my-alert-icon {
+  color: #ed4014;
+}
+.my-alert-with-desc {
+  padding: 16px;
+  position: relative;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  color: #515a6e;
+  line-height: 1.5;
+}
+.my-alert-with-desc.my-alert-with-icon {
+  padding: 16px 16px 16px 69px;
+}
+.my-alert-with-desc .my-alert-desc {
+  display: block;
+}
+.my-alert-with-desc .my-alert-message {
+  font-size: 14px;
+  color: #17233d;
+  display: block;
+}
+.my-alert-with-desc .my-alert-icon {
+  top: 50%;
+  left: 24px;
+  margin-top: -24px;
+  font-size: 28px;
+}
+.my-alert-with-banner {
+  border-radius: 0;
+}
+.my-fresh {
+  position: relative;
+  height: 100%;
+  transition-property: transform;
+}
+.my-fresh-tip {
+  /*display: flex;
+    display: -webkit-flex;
+    justify-content: center;
+    -webkit-justify-content: center;
+    align-items: center;
+    -webkit-align-items: center;
+    position: absolute;
+    top: 0;
+    width: 100%;*/
+  position: absolute;
+  left: 0;
+  width: 100%;
+  overflow: hidden;
+  text-align: center;
+  transform: translateY(-100%);
+}
+.my-fresh-cont {
+  height: 100%;
+}
+.my-tabs {
+  font-size: 14px;
+}
+.my-tabs-cont {
+  height: 100%;
+}
+/*# sourceMappingURL=index.css.map */
