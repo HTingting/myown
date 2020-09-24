@@ -2,14 +2,30 @@
     <div class="tabs">
         <!--标签页标题，这里要用v-for-->
         <div :class="[prefixCls + '-bar']">
-            <div :class="tabCls(item)"
-                v-for="(item,index) in navList"
-                @click="handleChange(index)">
-                {{item.label}}
+            <!--右边固定的内容，比如京东的导航，右侧有固定的模块 【分类】-->
+            <div :class="[prefixCls + '-nav-right']"><slot name="extra"></slot></div>
+            <div :class="[prefixCls + '-nav-container']">
+                <div :class="[prefixCls + '-nav-wrap']">
+                    <!--左箭头-->
+                    <span :class="[prefixCls + '-nav-prev']" @click="scrollPrev"></span>
+                    <!--右箭头-->
+                    <span :class="[prefixCls + '-nav-next']" @click="scrollNext"></span>
+                    <!--导航nav-->
+                    <div :class="[prefixCls + '-nav-scroll']">
+                        <div :class="[prefixCls + '-nav']" ref="nav">
+                            <!--条的样式-->
+                            <div :class="barClasses" ref="line" :style="barStyle"></div>
+                            <!--tab的样式-->
+                            <div :class="tabCls(item)" :style="tabStyle" v-for="(item,index) in navList" @click="handleChange($event,index)">
+                                {{item.label}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <!--pane 的内容-->
-        <div :class="contentClasses">
+        <div :class="contentClasses" ref="panes">
             <slot></slot>
         </div>
     </div>
@@ -31,14 +47,18 @@
                 default: 0,
             },
             background:String,              //标签栏背景色
-            duration: Number | String,     //动画时间，单位秒
+            duration: Number | String,      //动画时间，单位秒
             type: String,                   //样式风格类型，可选值为card
             ellipsis: Boolean,              //是否省略过长的标题文字
             titleActiveColor: String,       //标题选中态颜色
             titleInactiveColor: String,     //标题默认态颜色
             value:{
+                type: [String, Number],
+            },
+            swipeThreshold:{
                 type: String | Number,
-            }
+                default: 4,
+            },
         },
         watch:{
             value(newVal){
@@ -52,8 +72,11 @@
         computed:{
             barClasses(){
                 return [
-                    `${prefixCls}-bar`
-                ]
+                    `${prefixCls}-ink-bar`,
+                    {
+                        [`${prefixCls}-ink-bar-animated`]: this.animated
+                    }
+                ];
             },
             //内容class
             contentClasses (){
@@ -64,6 +87,27 @@
                     }
                 ]
             },
+            tabStyle(){
+                let clientWidth = document.documentElement.offsetWidth;
+                let style = {
+                    width: `${ clientWidth/ this.swipeThreshold}px`,
+                    flexShrink: '0'
+                };
+                return style;
+            },
+            barStyle () {
+                let style = {
+                    width: `${this.barWidth}px`
+                };
+                /**
+                 * transform: translateX(45px) translateX(-50%);
+                 transition-duration: 0.3s;
+                 */
+                style.transform = `translate3d(${this.barOffset}px, 0px, 0px)`;
+                style.transitionDuration = '0.3s';
+
+                return style;
+            },
 
         },
         data(){
@@ -71,6 +115,10 @@
                 //业务数据
                 navList:[],
                 currentValue: this.value,
+                prefixCls:prefixCls,  //注意啊，常量不能直接在视图中使用啊。要重新在data里面赋值
+                barWidth:0,
+                barOffset:0,
+                showMove:0,  //应该移动
             }
         },
         methods:{
@@ -79,12 +127,14 @@
             */
             tabCls(item){
                 return [
-                    'tabs-tab',
+                    `${prefixCls}-tab`,
                     {
-                        //给当前选中的tab加一个class
-                        'tabs-tab-active': item.name === this.currentValue
+                        [`${prefixCls}-tab-disabled`]: item.disabled,
+                        [`${prefixCls}-tab-active`]: item.name === this.currentValue,
+                        [`${prefixCls}-tab-focused`]: item.name === this.focusedKey,
+                        [`${prefixCls}-tab-${this.swipeThreshold}`] : this.swipeThreshold
                     }
-                ]
+                ];
             },
 
             /**
@@ -114,7 +164,6 @@
                         return a.index > b.index ? 1 : -1;
                     }
                 });
-                //console.log('最后得到的tabpanes',TabPanes);
                 return TabPanes;
             },
 
@@ -124,15 +173,40 @@
              * 2.获取tab的name
              * 3.重新updateStatus? 不是
              *   这一步应该是触发点击事件
-             *
+             * 4.移动端，要设置样式点击的tab的nav居中，这里需要优化
+             * 5.设置样式
              */
-            handleChange(index){
+            handleChange(e,index){
+                //console.log(e);
                 var nav = this.navList[index];
                 var name = nav.name;
                 this.currentValue = name;
                 //vue 再父子组件传值时，除了传统的父组件 ：属性去传值外，还可以使用 父组件v-model传值，子组件props[‘value’]接收
                 this.$emit('input', name);
                 this.$emit('on-click', name);
+
+                //设置样式
+                this.setNavCenter(e);
+            },
+
+            /**
+             * 点击tab栏居中显示
+             * 通过设置nav的scrollLeft来更新样式
+             */
+            setNavCenter(e){
+                //设置样式
+                let targetWidth = e.target.offsetWidth;
+                let leftWidth = e.target.offsetLeft;
+                let navWidth = this.$refs.nav.offsetWidth;
+                let shouldLeftWidth = navWidth / 2 - targetWidth / 2;
+                this.shouldMove = leftWidth - shouldLeftWidth;
+                console.log(this.shouldMove);
+                this.$refs.nav.scrollLeft = this.shouldMove;
+
+                //发现不能这么设置line的样式 todo
+                //console.log(this.$refs.line);
+                /*this.$refs.line.style.transform = `translateX(${this.showMove}px) translateX(-50%)`;
+                this.$refs.line.style.transitionDuration = '0.3s';*/
             },
 
             /**
@@ -172,7 +246,57 @@
                     }
                 });
                 _this.updateStatus();
-             }
+                this.updateBar();
+             },
+
+            /**
+             * 设置样式
+             * 1.获取
+             */
+            updateBar(){
+                this.$nextTick(() => {
+                    const index = this.getTabIndex(this.currentValue);
+                    if (!this.$refs.nav) return;  // 页面销毁时，这里会报错，为了解决 #2100
+                    const prevTabs = this.$refs.nav.querySelectorAll(`.${prefixCls}-tab`);
+                    const tab = prevTabs[index];
+                    console.log(tab);
+                    this.barWidth = tab ? parseFloat(tab.offsetWidth) : 0;
+
+                    if (index > 0) {
+                        let offset = 0;
+                        for (let i = 0; i < index; i++) {
+                            offset += parseFloat(prevTabs[i].offsetWidth);
+                        }
+                        this.barOffset = offset;
+                    } else {
+                        this.barOffset = 0;
+                    }
+                    console.log(this.barOffset);
+                });
+            },
+
+            /**
+             * 根据name返回nav的下标
+             */
+            getTabIndex(name){
+                return this.navList.findIndex(nav => nav.name === name);
+            },
+
+            /**
+             * 向前滚动
+             */
+            scrollPrev(){
+
+            },
+
+            /**
+             * 向后滚动
+             */
+            scrollNext(){
+
+            },
+
+
 
         }
     }

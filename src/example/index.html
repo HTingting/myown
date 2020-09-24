@@ -11,4 +11,21 @@
 <!-- <script type="text/javascript" src="/test/dist/vendor.js"></script>
 <script type="text/javascript" src="/test/dist/main.js"></script> -->
 </body>
+<script>
+    //自执行函数获取字体大小
+    ~function () {
+        let computed= function () {
+            let desW=750;//设计稿宽度
+            let devW=document.documentElement.clientWidth;//当前设备的宽度
+            if(devW>=750){
+                document.documentElement.style.fontSize="100px";
+                return false;
+            }else{
+                document.documentElement.style.fontSize=devW/desW*100+"px";
+            }
+        }
+        computed();
+        window.addEventListener("resize",computed,false)
+    }();
+</script>
 </html>

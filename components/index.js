@@ -1,10 +1,12 @@
 import PullFresh from './pullFresh/index.js';
 import Tabs from './tabs/index.js';
+import Dragger from './dragger/index.js';
 
 const components = {
     PullFresh,
     Tabs: Tabs,
     TabPane: Tabs.Pane,
+    Dragger: Dragger
 }
 
 const myOwn = {
